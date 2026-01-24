@@ -1,7 +1,7 @@
 require("dotenv").config();
 const connectDB = require("./config/db");
 
-
+const movieRoutes = require("./routes/movieRoutes");
 const express = require("express");
 const cors = require("cors");
 
@@ -11,6 +11,7 @@ const PORT = 5000;
 // middlewares
 app.use(cors());
 app.use(express.json());
+app.use("/movies", movieRoutes);
 
 // test route
 app.get("/", (req, res) => {
