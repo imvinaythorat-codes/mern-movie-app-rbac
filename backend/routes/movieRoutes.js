@@ -50,4 +50,27 @@ router.delete("/:id", authMiddleware, adminMiddleware, async (req, res) => {
   }
 });
 
+// SEARCH movies
+router.get("/search", async (req, res) => {
+  try {
+    const { q } = req.query;
+
+    if (!q) {
+      return res.status(400).json({ message: "Search query is required" });
+    }
+
+    const movies = await Movie.find({
+      $or: [
+        { title: { $regex: q, $options: "i" } },
+        { description: { $regex: q, $options: "i" } }
+      ]
+    });
+
+    res.json(movies);
+  } catch (error) {
+    res.status(500).json({ message: "Search failed" });
+  }
+});
+
+
 module.exports = router;
