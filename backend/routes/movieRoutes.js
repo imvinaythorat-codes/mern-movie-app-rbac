@@ -72,5 +72,25 @@ router.get("/search", async (req, res) => {
   }
 });
 
+// SORT movies
+router.get("/sorted", async (req, res) => {
+  try {
+    const { by, order } = req.query;
+
+    const allowedFields = ["title", "rating", "releaseDate", "duration"];
+    if (!allowedFields.includes(by)) {
+      return res.status(400).json({ message: "Invalid sort field" });
+    }
+
+    const sortOrder = order === "desc" ? -1 : 1;
+
+    const movies = await Movie.find().sort({ [by]: sortOrder });
+
+    res.json(movies);
+  } catch (error) {
+    res.status(500).json({ message: "Sorting failed" });
+  }
+});
+
 
 module.exports = router;
