@@ -1,23 +1,63 @@
-import { Routes, Route } from "react-router-dom";
-import ProtectedRoute from "@/routes/ProtectedRoute";
-import AdminRoute from "@/routes/AdminRoute";
+import React from 'react';
+import { ThemeProvider } from '@mui/material/styles';
+import { CssBaseline, Box, Typography } from '@mui/material';
+import theme from '@/styles/theme';
 
 function App() {
   return (
-    <Routes>
-      <Route path="/login" element={<div>Login Page</div>} />
-      <Route path="/" element={<div>Public Home</div>} />
-
-      <Route element={<ProtectedRoute />}>
-        <Route path="/profile" element={<div>User Profile</div>} />
-      </Route>
-
-      <Route element={<AdminRoute />}>
-        <Route path="/admin" element={<div>Admin Dashboard</div>} />
-      </Route>
-    </Routes>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Box
+        sx={{
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          background: 'linear-gradient(135deg, #141414 0%, #2F2F2F 100%)',
+          padding: 3,
+        }}
+      >
+        <Typography
+          variant="h1"
+          sx={{
+            color: 'primary.main',
+            fontWeight: 900,
+            letterSpacing: '0.1em',
+            marginBottom: 2,
+            textShadow: '0px 4px 12px rgba(229, 9, 20, 0.5)',
+          }}
+        >
+          CINEVAULT
+        </Typography>
+        
+        <Typography
+          variant="h5"
+          sx={{
+            color: 'text.secondary',
+            fontWeight: 300,
+            marginBottom: 4,
+          }}
+        >
+          Your Personal Movie Collection
+        </Typography>
+        
+        <Typography
+          variant="body1"
+          sx={{
+            color: 'success.main',
+            fontWeight: 500,
+            padding: 2,
+            border: '1px solid',
+            borderColor: 'success.main',
+            borderRadius: 1,
+          }}
+        >
+          ✅ Netflix Theme Configured Successfully
+        </Typography>
+      </Box>
+    </ThemeProvider>
   );
 }
 
 export default App;
-

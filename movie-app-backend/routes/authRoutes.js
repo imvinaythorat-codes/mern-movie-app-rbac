@@ -1,4 +1,6 @@
 const express = require("express");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
 const router = express.Router();
@@ -8,19 +10,28 @@ router.post("/register", async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // basic validation
+    // Basic validation
     if (!name || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    // check if user exists
+    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    // create user
-    const user = new User({ name, email, password });
+    // Hash password (SINGLE HASH — IMPORTANT)
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create user
+    const user = new User({
+      name,
+      email,
+      password: hashedPassword,
+      role: "user", // default role
+    });
+
     await user.save();
 
     res.status(201).json({ message: "User registered successfully" });
@@ -30,8 +41,6 @@ router.post("/register", async (req, res) => {
   }
 });
 
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 
 // LOGIN USER
 router.post("/login", async (req, res) => {
@@ -58,7 +67,15 @@ router.post("/login", async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    res.json({ token });
+    res.json({ 
+      token, 
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role
+      }
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Login failed" });

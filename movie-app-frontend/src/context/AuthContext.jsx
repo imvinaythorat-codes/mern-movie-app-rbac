@@ -1,60 +1,48 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { jwtDecode } from "jwt-decode";
 
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
+  const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const syncUserFromToken = () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      setUser(null);
-      return;
-    }
-
-    try {
-      const decoded = jwtDecode(token);
-      setUser({
-        token,
-        role: decoded.role,
-        id: decoded.id,
-      });
-    } catch (err) {
-      localStorage.removeItem("token");
-      setUser(null);
-    }
-  };
-
   useEffect(() => {
-    syncUserFromToken();
-    setLoading(false);
+    const storedToken = localStorage.getItem("token");
+    const storedUser = localStorage.getItem("user");
 
-    // Listen for manual localStorage changes
-    window.addEventListener("storage", syncUserFromToken);
-    return () => window.removeEventListener("storage", syncUserFromToken);
+    if (storedToken) {
+      setToken(storedToken);
+      setUser(storedUser ? JSON.parse(storedUser) : null);
+    }
+
+    setLoading(false);
   }, []);
 
-  const login = (token) => {
+  const login = (token, userData = null) => {
     localStorage.setItem("token", token);
-    syncUserFromToken();
+    if (userData) {
+      localStorage.setItem("user", JSON.stringify(userData));
+      setUser(userData);
+    }
+    setToken(token);
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
+    localStorage.clear();
+    setToken(null);
     setUser(null);
   };
 
   return (
     <AuthContext.Provider
       value={{
+        token,
         user,
-        isAuthenticated: !!user,
-        isAdmin: user?.role === "admin",
+        isAuthenticated: !!token,
+        loading,
         login,
         logout,
-        loading,
       }}
     >
       {children}
@@ -62,4 +50,11 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used inside AuthProvider");
+  }
+  return context;
+};
+

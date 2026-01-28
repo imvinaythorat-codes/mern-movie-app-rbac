@@ -11,12 +11,17 @@ const movieSchema = new mongoose.Schema(
     },
     rating: {
       type: Number,
+      min: 0,
+      max: 10,
     },
     releaseDate: {
       type: Date,
     },
     duration: {
       type: Number, // minutes
+    },
+    poster: {
+      type: String, // URL to poster image
     },
   },
   { timestamps: true }
