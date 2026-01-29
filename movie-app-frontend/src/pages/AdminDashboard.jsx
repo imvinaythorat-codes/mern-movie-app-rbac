@@ -1,94 +1,105 @@
 import React from 'react';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography, Container, Grid, Paper } from '@mui/material';
 import { useAuth } from '@/context/AuthContext';
 import { motion } from 'framer-motion';
-import { AdminPanelSettings } from '@mui/icons-material';
+import {
+  AdminPanelSettings,
+  AddCircle,
+  Edit,
+  Delete,
+} from '@mui/icons-material';
+import Layout from '@/components/common/Layout';
 
 const AdminDashboard = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
+
+  const features = [
+    {
+      icon: <AddCircle sx={{ fontSize: 48, color: 'primary.main' }} />,
+      title: 'Add Movies',
+      description: 'Add new movies to the database',
+      status: 'Coming in Step 11',
+    },
+    {
+      icon: <Edit sx={{ fontSize: 48, color: 'info.main' }} />,
+      title: 'Edit Movies',
+      description: 'Update existing movie details',
+      status: 'Coming in Step 11',
+    },
+    {
+      icon: <Delete sx={{ fontSize: 48, color: 'error.main' }} />,
+      title: 'Delete Movies',
+      description: 'Remove movies from the database',
+      status: 'Coming in Step 11',
+    },
+  ];
 
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        background: 'linear-gradient(135deg, #141414 0%, #2F2F2F 100%)',
-        padding: 3,
-      }}
-    >
-      <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <AdminPanelSettings
-          sx={{ fontSize: 80, color: 'primary.main', mb: 3 }}
-        />
-      </motion.div>
+    <Layout>
+      <Container maxWidth="lg" sx={{ py: 8 }}>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          {/* Header */}
+          <Box sx={{ textAlign: 'center', mb: 6 }}>
+            <AdminPanelSettings sx={{ fontSize: 64, color: 'primary.main', mb: 2 }} />
+            <Typography
+              variant="h2"
+              sx={{
+                fontWeight: 900,
+                color: 'primary.main',
+                mb: 2,
+                textShadow: '0px 4px 12px rgba(229, 9, 20, 0.5)',
+              }}
+            >
+              Admin Dashboard
+            </Typography>
+            <Typography variant="h6" sx={{ color: 'text.secondary' }}>
+              Welcome, Admin {user?.name}
+            </Typography>
+          </Box>
 
-      <Typography
-        variant="h2"
-        sx={{
-          color: 'primary.main',
-          fontWeight: 900,
-          letterSpacing: '0.1em',
-          marginBottom: 2,
-          textShadow: '0px 4px 12px rgba(229, 9, 20, 0.5)',
-        }}
-      >
-        ADMIN DASHBOARD
-      </Typography>
-
-      <Typography
-        variant="h6"
-        sx={{
-          color: 'text.secondary',
-          marginBottom: 4,
-        }}
-      >
-        Welcome, Admin {user?.name}!
-      </Typography>
-
-      <Box
-        sx={{
-          padding: 3,
-          border: '1px solid',
-          borderColor: 'success.main',
-          borderRadius: 2,
-          backgroundColor: 'background.paper',
-          minWidth: 300,
-          mb: 3,
-        }}
-      >
-        <Typography variant="body1" sx={{ color: 'success.main', mb: 2 }}>
-          ✅ Admin Access Granted
-        </Typography>
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          Admin features will be added in Step 8-10:
-        </Typography>
-        <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
-          • Add Movie
-        </Typography>
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          • Edit Movie
-        </Typography>
-        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          • Delete Movie
-        </Typography>
-      </Box>
-
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={logout}
-        sx={{ paddingX: 4, paddingY: 1.5 }}
-      >
-        Logout
-      </Button>
-    </Box>
+          {/* Feature Cards */}
+          <Grid container spacing={4}>
+            {features.map((feature, index) => (
+              <Grid item xs={12} md={4} key={index}>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <Paper
+                    sx={{
+                      padding: 4,
+                      textAlign: 'center',
+                      backgroundColor: 'background.paper',
+                      height: '100%',
+                      transition: 'transform 0.3s',
+                      '&:hover': {
+                        transform: 'translateY(-8px)',
+                      },
+                    }}
+                  >
+                    <Box sx={{ mb: 2 }}>{feature.icon}</Box>
+                    <Typography variant="h5" sx={{ fontWeight: 700, mb: 1, color: 'text.primary' }}>
+                      {feature.title}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>
+                      {feature.description}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'warning.main', fontWeight: 600 }}>
+                      {feature.status}
+                    </Typography>
+                  </Paper>
+                </motion.div>
+              </Grid>
+            ))}
+          </Grid>
+        </motion.div>
+      </Container>
+    </Layout>
   );
 };
 
