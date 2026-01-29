@@ -40,6 +40,7 @@ export const AuthProvider = ({ children }) => {
    * Called from Login component after authService.login() succeeds
    */
   const login = (userData) => {
+    console.log('AuthContext: Setting user', userData); // Debug log
     setUser(userData);
   };
 
@@ -55,7 +56,10 @@ export const AuthProvider = ({ children }) => {
    * Check if user is authenticated
    */
   const isAuthenticated = () => {
-    return !!user;
+    const hasUser = !!user;
+    const hasToken = !!getToken();
+    console.log('AuthContext: isAuthenticated check', { hasUser, hasToken, user }); // Debug log
+    return hasUser && hasToken;
   };
 
   /**
