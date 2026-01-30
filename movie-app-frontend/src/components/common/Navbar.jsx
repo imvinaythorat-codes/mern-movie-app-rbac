@@ -18,7 +18,7 @@ import {
   Movie as MovieIcon,
   AdminPanelSettings as AdminIcon,
   Logout as LogoutIcon,
-  AccountCircle as AccountIcon,
+  Home as HomeIcon,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
@@ -66,7 +66,14 @@ const Navbar = () => {
         boxShadow: 'none',
       }}
     >
-      <Toolbar sx={{ justifyContent: 'space-between', py: 1 }}>
+      <Toolbar 
+        sx={{ 
+          justifyContent: 'space-between', 
+          py: { xs: 0.75, sm: 1 }, 
+          px: { xs: 1.5, sm: 2, md: 3 },
+          minHeight: { xs: 56, sm: 64 },
+        }}
+      >
         {/* Logo / Brand */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
@@ -80,10 +87,10 @@ const Navbar = () => {
               display: 'flex',
               alignItems: 'center',
               textDecoration: 'none',
-              gap: 1,
+              gap: { xs: 0.5, sm: 1 },
             }}
           >
-            <MovieIcon sx={{ fontSize: 32, color: 'primary.main' }} />
+            <MovieIcon sx={{ fontSize: { xs: 28, sm: 32, md: 36 }, color: 'primary.main' }} />
             <Typography
               variant="h5"
               sx={{
@@ -91,22 +98,40 @@ const Navbar = () => {
                 color: 'primary.main',
                 letterSpacing: '0.1em',
                 textShadow: '0px 2px 8px rgba(229, 9, 20, 0.5)',
+                fontSize: { xs: '1.1rem', sm: '1.35rem', md: '1.5rem' },
+                display: { xs: 'none', xxs: 'block' },
               }}
             >
               CINEVAULT
+            </Typography>
+            <Typography
+              variant="h5"
+              sx={{
+                fontWeight: 900,
+                color: 'primary.main',
+                letterSpacing: '0.1em',
+                textShadow: '0px 2px 8px rgba(229, 9, 20, 0.5)',
+                fontSize: '1rem',
+                display: { xs: 'block', xxs: 'none' },
+              }}
+            >
+              CV
             </Typography>
           </Box>
         </motion.div>
 
         {/* Navigation Links */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          {/* Home Link */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1.5, md: 2 } }}>
+          {/* Home Button - Desktop with text */}
           <Button
             component={Link}
             to="/"
             sx={{
               color: 'text.primary',
               fontWeight: 500,
+              fontSize: { sm: '0.875rem', md: '1rem' },
+              px: { sm: 1.5, md: 2 },
+              display: { xs: 'none', sm: 'inline-flex' },
               '&:hover': {
                 color: 'primary.main',
                 backgroundColor: 'transparent',
@@ -116,30 +141,68 @@ const Navbar = () => {
             Home
           </Button>
 
+          {/* Home Button - Mobile icon only */}
+          <IconButton
+            component={Link}
+            to="/"
+            sx={{
+              display: { xs: 'inline-flex', sm: 'none' },
+              color: 'text.primary',
+              '&:hover': {
+                color: 'primary.main',
+                backgroundColor: 'transparent',
+              },
+            }}
+          >
+            <HomeIcon sx={{ fontSize: 24 }} />
+          </IconButton>
+
           {/* Admin Dashboard Link (Only for admins) */}
           {isAdmin() && (
-            <Button
-              component={Link}
-              to="/admin"
-              startIcon={<AdminIcon />}
-              sx={{
-                color: 'text.primary',
-                fontWeight: 500,
-                '&:hover': {
-                  color: 'primary.main',
-                  backgroundColor: 'transparent',
-                },
-              }}
-            >
-              Admin Dashboard
-            </Button>
+            <>
+              {/* Desktop */}
+              <Button
+                component={Link}
+                to="/admin"
+                startIcon={<AdminIcon />}
+                sx={{
+                  color: 'text.primary',
+                  fontWeight: 500,
+                  fontSize: { sm: '0.8rem', md: '0.875rem' },
+                  px: { sm: 1.5, md: 2 },
+                  display: { xs: 'none', sm: 'inline-flex' },
+                  '&:hover': {
+                    color: 'primary.main',
+                    backgroundColor: 'transparent',
+                  },
+                }}
+              >
+                Admin
+              </Button>
+
+              {/* Mobile icon only */}
+              <IconButton
+                component={Link}
+                to="/admin"
+                sx={{
+                  display: { xs: 'inline-flex', sm: 'none' },
+                  color: 'text.primary',
+                  '&:hover': {
+                    color: 'primary.main',
+                    backgroundColor: 'transparent',
+                  },
+                }}
+              >
+                <AdminIcon sx={{ fontSize: 24 }} />
+              </IconButton>
+            </>
           )}
 
           {/* User Menu */}
           <IconButton
             onClick={handleMenuOpen}
             sx={{
-              ml: 2,
+              ml: { xs: 0.5, sm: 1 },
               '&:hover': {
                 transform: 'scale(1.1)',
               },
@@ -149,9 +212,9 @@ const Navbar = () => {
             <Avatar
               sx={{
                 bgcolor: 'primary.main',
-                width: 40,
-                height: 40,
-                fontSize: '1rem',
+                width: { xs: 36, sm: 40 },
+                height: { xs: 36, sm: 40 },
+                fontSize: { xs: '0.9rem', sm: '1rem' },
                 fontWeight: 700,
               }}
             >
@@ -169,7 +232,7 @@ const Navbar = () => {
               elevation: 3,
               sx: {
                 mt: 1.5,
-                minWidth: 220,
+                minWidth: { xs: 200, sm: 240 },
                 backgroundColor: 'background.paper',
                 border: '1px solid rgba(255, 255, 255, 0.1)',
               },
@@ -179,10 +242,24 @@ const Navbar = () => {
           >
             {/* User Info */}
             <Box sx={{ px: 2, py: 1.5 }}>
-              <Typography variant="subtitle1" sx={{ fontWeight: 600, color: 'text.primary' }}>
+              <Typography 
+                variant="subtitle1" 
+                sx={{ 
+                  fontWeight: 600, 
+                  color: 'text.primary',
+                  fontSize: { xs: '0.95rem', sm: '1rem' },
+                }}
+              >
                 {user?.name}
               </Typography>
-              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              <Typography 
+                variant="body2" 
+                sx={{ 
+                  color: 'text.secondary',
+                  fontSize: { xs: '0.8rem', sm: '0.875rem' },
+                  wordBreak: 'break-word',
+                }}
+              >
                 {user?.email}
               </Typography>
               <Typography
@@ -192,6 +269,7 @@ const Navbar = () => {
                   fontWeight: 600,
                   mt: 0.5,
                   display: 'block',
+                  fontSize: { xs: '0.75rem', sm: '0.8rem' },
                 }}
               >
                 {isAdmin() ? '👑 Admin' : '✓ User'}
@@ -201,12 +279,14 @@ const Navbar = () => {
             <Divider />
 
             {/* Logout Button */}
-            <MenuItem onClick={handleLogout}>
+            <MenuItem onClick={handleLogout} sx={{ py: 1.5 }}>
               <ListItemIcon>
                 <LogoutIcon fontSize="small" sx={{ color: 'error.main' }} />
               </ListItemIcon>
               <ListItemText>
-                <Typography sx={{ color: 'error.main' }}>Logout</Typography>
+                <Typography sx={{ color: 'error.main', fontSize: { xs: '0.9rem', sm: '1rem' } }}>
+                  Logout
+                </Typography>
               </ListItemText>
             </MenuItem>
           </Menu>
