@@ -18,28 +18,78 @@ export const getAllMovies = async (page = 1, limit = 12) => {
   }
 };
 
-// Search movies by name or description
+// Search movies by name or description - CLIENT-SIDE
 export const searchMovies = async (query) => {
   try {
-    const response = await api.get('/movies/search', {
-      params: { q: query },
+    // Get all movies first
+    const response = await api.get('/movies');
+    let movies = response.data;
+    
+    // Handle different response formats
+    if (movies.movies && Array.isArray(movies.movies)) {
+      movies = movies.movies;
+    }
+    
+    // If no query, return all
+    if (!query || query.trim() === '') {
+      return movies;
+    }
+    
+    // Search on frontend
+    const searchTerm = query.toLowerCase();
+    const filtered = movies.filter(movie => {
+      const nameMatch = movie.name?.toLowerCase().includes(searchTerm);
+      const descMatch = movie.description?.toLowerCase().includes(searchTerm);
+      return nameMatch || descMatch;
     });
-    return response.data;
+    
+    return filtered;
   } catch (error) {
     const message = error.response?.data?.message || 'Search failed.';
     throw new Error(message);
   }
 };
 
-// Get sorted movies
+// Get sorted movies - CLIENT-SIDE
 export const getSortedMovies = async (sortBy = 'name', order = 'asc') => {
   try {
-    const response = await api.get('/movies/sorted', {
-      params: { by: sortBy, order },
+    // Get all movies first
+    const response = await api.get('/movies');
+    let movies = response.data;
+    
+    // Handle different response formats
+    if (movies.movies && Array.isArray(movies.movies)) {
+      movies = movies.movies;
+    }
+    
+    // Sort on frontend
+    const sorted = [...movies].sort((a, b) => {
+      let aVal = a[sortBy];
+      let bVal = b[sortBy];
+      
+      // Handle null/undefined values
+      if (aVal === null || aVal === undefined) return 1;
+      if (bVal === null || bVal === undefined) return -1;
+      
+      // Handle different data types
+      if (sortBy === 'releaseDate') {
+        aVal = new Date(aVal).getTime();
+        bVal = new Date(bVal).getTime();
+      } else if (typeof aVal === 'string') {
+        aVal = aVal.toLowerCase();
+        bVal = bVal ? bVal.toLowerCase() : '';
+      }
+      
+      if (order === 'asc') {
+        return aVal > bVal ? 1 : -1;
+      } else {
+        return aVal < bVal ? 1 : -1;
+      }
     });
-    return response.data;
+    
+    return sorted;
   } catch (error) {
-    const message = error.response?.data?.message || 'Failed to sort movies.';
+    const message = error.response?.data?.message || 'Failed to fetch movies.';
     throw new Error(message);
   }
 };

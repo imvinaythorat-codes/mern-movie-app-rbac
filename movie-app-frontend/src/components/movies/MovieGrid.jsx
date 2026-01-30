@@ -8,7 +8,7 @@ const MovieGrid = ({ movies, loading }) => {
     return (
       <Grid container spacing={{ xs: 2, sm: 2.5, md: 3 }}>
         {[...Array(12)].map((_, index) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+          <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={index}>
             <Box>
               <Skeleton
                 variant="rectangular"
@@ -31,7 +31,7 @@ const MovieGrid = ({ movies, loading }) => {
   return (
     <Grid container spacing={{ xs: 2, sm: 2.5, md: 3 }}>
       {movies.map((movie) => (
-        <Grid item xs={12} sm={6} md={4} lg={3} key={movie._id}>
+        <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={movie._id}>
           <MovieCard movie={movie} />
         </Grid>
       ))}
