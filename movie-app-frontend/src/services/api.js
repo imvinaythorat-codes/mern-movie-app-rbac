@@ -1,9 +1,9 @@
 import axios from 'axios';
-import { API_BASE_URL, STORAGE_KEYS } from '@/utils/constants';
+import { STORAGE_KEYS } from "@/utils/constants";
 
 // Create axios instance with base configuration
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
