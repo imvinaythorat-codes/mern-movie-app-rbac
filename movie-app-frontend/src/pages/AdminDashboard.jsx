@@ -3,7 +3,6 @@ import {
   Box,
   Typography,
   Container,
-  Grid,
   Paper,
   Button,
   Table,
@@ -19,6 +18,11 @@ import {
   DialogContent,
   DialogActions,
   DialogContentText,
+  useMediaQuery,
+  useTheme,
+  Card,
+  CardContent,
+  Divider,
 } from "@mui/material";
 import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -36,6 +40,8 @@ import { getAllMovies, deleteMovie } from "@/services/movieService";
 const AdminDashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   // State
   const [movies, setMovies] = useState([]);
@@ -63,6 +69,7 @@ const AdminDashboard = () => {
       setMovies(moviesData);
     } catch (err) {
       setError("Failed to load movies");
+      console.error("Error fetching movies:", err);
     } finally {
       setLoading(false);
     }
@@ -70,7 +77,6 @@ const AdminDashboard = () => {
 
   // Handle delete click
   const handleDeleteClick = (movie) => {
-    console.log("Movie to delete:", movie); // Debug log
     setMovieToDelete(movie);
     setDeleteDialogOpen(true);
   };
@@ -98,6 +104,69 @@ const AdminDashboard = () => {
     setMovieToDelete(null);
   };
 
+  // Mobile Card View
+  const MobileMovieCard = ({ movie }) => (
+    <Card sx={{ mb: 2, backgroundColor: 'background.paper' }}>
+      <CardContent>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, flex: 1, pr: 2 }}>
+            {movie.title || "Untitled"}
+          </Typography>
+          <Box sx={{ display: 'flex', gap: 0.5 }}>
+            <IconButton
+              color="primary"
+              size="small"
+              onClick={() => navigate(`/admin/edit-movie/${movie._id}`)}
+            >
+              <Edit fontSize="small" />
+            </IconButton>
+            <IconButton
+              color="error"
+              size="small"
+              onClick={() => handleDeleteClick(movie)}
+            >
+              <Delete fontSize="small" />
+            </IconButton>
+          </Box>
+        </Box>
+        
+        <Divider sx={{ my: 1.5 }} />
+        
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Typography variant="body2" color="text.secondary">
+              Rating:
+            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Star sx={{ fontSize: 16, color: 'warning.main' }} />
+              <Typography variant="body2" fontWeight={600}>
+                {movie.rating?.toFixed(1) || "N/A"}
+              </Typography>
+            </Box>
+          </Box>
+          
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Typography variant="body2" color="text.secondary">
+              Year:
+            </Typography>
+            <Typography variant="body2" fontWeight={600}>
+              {movie.releaseDate ? new Date(movie.releaseDate).getFullYear() : "N/A"}
+            </Typography>
+          </Box>
+          
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Typography variant="body2" color="text.secondary">
+              Duration:
+            </Typography>
+            <Typography variant="body2" fontWeight={600}>
+              {movie.duration ? `${movie.duration} min` : "N/A"}
+            </Typography>
+          </Box>
+        </Box>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <Layout>
       <Container maxWidth="xl" sx={{ py: { xs: 3, sm: 4, md: 6 } }}>
@@ -109,7 +178,7 @@ const AdminDashboard = () => {
           {/* Header */}
           <Box sx={{ textAlign: "center", mb: 6 }}>
             <AdminPanelSettings
-              sx={{ fontSize: 64, color: "primary.main", mb: 2 }}
+              sx={{ fontSize: { xs: 48, md: 64 }, color: "primary.main", mb: 2 }}
             />
             <Typography
               variant="h2"
@@ -124,7 +193,7 @@ const AdminDashboard = () => {
               Admin Dashboard
             </Typography>
             <Typography variant="h6" sx={{ color: "text.secondary" }}>
-              Welcome, Admin {user?.name}
+              Welcome, Admin {user?.title}
             </Typography>
           </Box>
 
@@ -148,39 +217,99 @@ const AdminDashboard = () => {
             </Alert>
           )}
 
-          {/* Movies Table */}
-          <Paper sx={{ width: "100%", overflow: "hidden" }}>
-            <TableContainer sx={{ maxHeight: 600 }}>
-              <Table stickyHeader>
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: 700 }}>Name</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Rating</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Year</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }}>Duration</TableCell>
-                    <TableCell sx={{ fontWeight: 700 }} align="center">
-                      Actions
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {loading ? (
+          {/* Loading State */}
+          {loading ? (
+            <Box sx={{ textAlign: 'center', py: 8 }}>
+              <Typography variant="h6" color="text.secondary">
+                Loading movies...
+              </Typography>
+            </Box>
+          ) : movies.length === 0 ? (
+            <Box sx={{ textAlign: 'center', py: 8 }}>
+              <Typography variant="h6" color="text.secondary">
+                No movies found. Add your first movie!
+              </Typography>
+            </Box>
+          ) : isMobile ? (
+            /* Mobile Card View */
+            <Box>
+              {movies.map((movie) => (
+                <MobileMovieCard key={movie._id} movie={movie} />
+              ))}
+            </Box>
+          ) : (
+            /* Desktop Table View */
+            <Paper sx={{ width: "100%", overflow: "hidden" }}>
+              <TableContainer sx={{ maxHeight: 600 }}>
+                <Table stickyHeader sx={{ minWidth: 800 }}>
+                  <TableHead>
                     <TableRow>
-                      <TableCell colSpan={5} align="center">
-                        Loading movies...
+                      <TableCell 
+                        sx={{ 
+                          fontWeight: 700,
+                          width: '35%',
+                          minWidth: 200
+                        }}
+                      >
+                        Name
+                      </TableCell>
+                      <TableCell 
+                        sx={{ 
+                          fontWeight: 700,
+                          width: '15%',
+                          minWidth: 100
+                        }}
+                      >
+                        Rating
+                      </TableCell>
+                      <TableCell 
+                        sx={{ 
+                          fontWeight: 700,
+                          width: '15%',
+                          minWidth: 80
+                        }}
+                      >
+                        Year
+                      </TableCell>
+                      <TableCell 
+                        sx={{ 
+                          fontWeight: 700,
+                          width: '15%',
+                          minWidth: 100
+                        }}
+                      >
+                        Duration
+                      </TableCell>
+                      <TableCell 
+                        sx={{ 
+                          fontWeight: 700,
+                          width: '20%',
+                          minWidth: 120
+                        }} 
+                        align="center"
+                      >
+                        Actions
                       </TableCell>
                     </TableRow>
-                  ) : movies.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={5} align="center">
-                        No movies found. Add your first movie!
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    movies.map((movie) => (
+                  </TableHead>
+                  <TableBody>
+                    {movies.map((movie) => (
                       <TableRow key={movie._id} hover>
-                        <TableCell>{movie.title}</TableCell>
-                        <TableCell>
+                        <TableCell
+                          sx={{
+                            width: '35%',
+                            minWidth: 200,
+                            maxWidth: 400,
+                            overflow: 'visible',
+                            whiteSpace: 'normal',
+                            wordBreak: 'break-word'
+                          }}
+                        >
+                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                            {movie.title || "Untitled"}
+                          </Typography>
+                        </TableCell>
+                        <TableCell sx={{ width: '15%' }}>
                           <Box
                             sx={{
                               display: "flex",
@@ -191,40 +320,52 @@ const AdminDashboard = () => {
                             <Star
                               sx={{ fontSize: 16, color: "warning.main" }}
                             />
-                            {movie.rating?.toFixed(1) || "N/A"}
+                            <Typography variant="body2">
+                              {movie.rating?.toFixed(1) || "N/A"}
+                            </Typography>
                           </Box>
                         </TableCell>
-                        <TableCell>
-                          {movie.releaseDate
-                            ? new Date(movie.releaseDate).getFullYear()
-                            : "N/A"}
+                        <TableCell sx={{ width: '15%' }}>
+                          <Typography variant="body2">
+                            {movie.releaseDate
+                              ? new Date(movie.releaseDate).getFullYear()
+                              : "N/A"}
+                          </Typography>
                         </TableCell>
-                        <TableCell>{movie.duration} min</TableCell>
-                        <TableCell align="center">
-                          <IconButton
-                            color="primary"
-                            size="small"
-                            onClick={() =>
-                              navigate(`/admin/edit-movie/${movie._id}`)
-                            }
-                          >
-                            <Edit />
-                          </IconButton>
-                          <IconButton
-                            color="error"
-                            size="small"
-                            onClick={() => handleDeleteClick(movie)}
-                          >
-                            <Delete />
-                          </IconButton>
+                        <TableCell sx={{ width: '15%' }}>
+                          <Typography variant="body2">
+                            {movie.duration ? `${movie.duration} min` : "N/A"}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="center" sx={{ width: '20%' }}>
+                          <Box sx={{ display: 'flex', gap: 1, justifyContent: 'center' }}>
+                            <IconButton
+                              color="primary"
+                              size="small"
+                              onClick={() =>
+                                navigate(`/admin/edit-movie/${movie._id}`)
+                              }
+                              title="Edit movie"
+                            >
+                              <Edit />
+                            </IconButton>
+                            <IconButton
+                              color="error"
+                              size="small"
+                              onClick={() => handleDeleteClick(movie)}
+                              title="Delete movie"
+                            >
+                              <Delete />
+                            </IconButton>
+                          </Box>
                         </TableCell>
                       </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Paper>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
+          )}
         </motion.div>
       </Container>
 
@@ -246,7 +387,7 @@ const AdminDashboard = () => {
           <DialogContentText sx={{ color: "text.primary" }}>
             Are you sure you want to delete{" "}
             <Box component="span" sx={{ color: "error.main", fontWeight: 700 }}>
-              {movieToDelete?.title || movieToDelete?.name || "this movie"}
+              {movieToDelete?.title || "this movie"}
             </Box>
             ?
             <br />
