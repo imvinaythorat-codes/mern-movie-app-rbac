@@ -38,7 +38,7 @@ export const searchMovies = async (query) => {
     // Search on frontend
     const searchTerm = query.toLowerCase();
     const filtered = movies.filter(movie => {
-      const nameMatch = movie.name?.toLowerCase().includes(searchTerm);
+      const nameMatch = movie.title?.toLowerCase().includes(searchTerm);
       const descMatch = movie.description?.toLowerCase().includes(searchTerm);
       return nameMatch || descMatch;
     });

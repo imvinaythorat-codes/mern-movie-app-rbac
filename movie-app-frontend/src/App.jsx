@@ -12,6 +12,7 @@ import HomePage from '@/pages/HomePage';
 import LoginPage from '@/pages/LoginPage';
 import RegisterPage from '@/pages/RegisterPage';
 import AdminDashboard from '@/pages/AdminDashboard';
+import AddMoviePage from '@/pages/AddMoviePage';
 
 function App() {
   return (
@@ -40,6 +41,16 @@ function App() {
               element={
                 <AdminRoute>
                   <AdminDashboard />
+                </AdminRoute>
+              }
+            />
+            
+            {/* Add Movie Route */}
+            <Route
+              path="/admin/add-movie"
+              element={
+                <AdminRoute>
+                  <AddMoviePage />
                 </AdminRoute>
               }
             />

@@ -37,7 +37,7 @@ const MovieCard = ({ movie }) => {
             backgroundColor: 'background.default',
           }}
           image={movie.poster || 'https://via.placeholder.com/300x450?text=No+Poster'}
-          alt={movie.name}
+          alt={movie.title}
         />
 
         {/* Movie Details */}
@@ -58,7 +58,7 @@ const MovieCard = ({ movie }) => {
               minHeight: { xs: '2.5rem', sm: '3rem' },
             }}
           >
-            {movie.name}
+            {movie.title}
           </Typography>
 
           {/* Rating & Year */}
